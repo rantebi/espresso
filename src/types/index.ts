@@ -28,3 +28,13 @@ export interface UpdateIssueInput {
   status?: Status;
 }
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+}
+

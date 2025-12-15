@@ -1,5 +1,5 @@
 import { getDatabase } from '../config/database';
-import { Issue, CreateIssueInput, UpdateIssueInput } from '../types';
+import { Issue, CreateIssueInput, UpdateIssueInput, PaginatedResponse } from '../types';
 
 export class IssueModel {
   private get db() {
@@ -106,6 +106,46 @@ export class IssueModel {
     const stmt = this.db.prepare('DELETE FROM issues WHERE id = ?');
     const result = stmt.run(id);
     return result.changes > 0;
+  }
+
+  async findAll(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<Issue>> {
+    const offset = (page - 1) * pageSize;
+    
+    // Get total count
+    const countStmt = this.db.prepare('SELECT COUNT(*) as total FROM issues');
+    const countResult = countStmt.get() as { total: number };
+    const total = countResult.total;
+    
+    // Get paginated issues, ordered by createdAt DESC
+    const stmt = this.db.prepare(`
+      SELECT * FROM issues 
+      ORDER BY createdAt DESC 
+      LIMIT ? OFFSET ?
+    `);
+    const rows = stmt.all(pageSize, offset) as any[];
+    
+    const issues: Issue[] = rows.map((row) => ({
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      site: row.site,
+      severity: row.severity,
+      status: row.status,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }));
+    
+    const totalPages = Math.ceil(total / pageSize);
+    
+    return {
+      data: issues,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages,
+      },
+    };
   }
 }
 

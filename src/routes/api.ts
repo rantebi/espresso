@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   createIssue,
+  getAllIssues,
   getIssueById,
   updateIssue,
   deleteIssue,
@@ -19,6 +20,8 @@ router.post(
   handleValidationErrors,
   createIssue
 );
+
+router.get('/issues', getAllIssues);
 
 router.get('/issues/:id', getIssueById);
 

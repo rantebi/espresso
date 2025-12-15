@@ -28,6 +28,47 @@ export const createIssue = async (
   }
 };
 
+export const getAllIssues = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    // Parse query params, handling undefined and NaN
+    const pageParam = req.query.page as string | undefined;
+    const pageSizeParam = req.query.pageSize as string | undefined;
+    
+    const page = pageParam !== undefined ? parseInt(pageParam, 10) : 1;
+    const pageSize = pageSizeParam !== undefined ? parseInt(pageSizeParam, 10) : 10;
+
+    // Validate pagination params
+    if (isNaN(page) || page < 1) {
+      res.status(400).json({
+        success: false,
+        error: 'Page must be greater than 0',
+      });
+      return;
+    }
+
+    if (isNaN(pageSize) || pageSize < 1 || pageSize > 100) {
+      res.status(400).json({
+        success: false,
+        error: 'Page size must be between 1 and 100',
+      });
+      return;
+    }
+
+    const result = await IssueModel.findAll(page, pageSize);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getIssueById = async (
   req: Request,
   res: Response,
