@@ -1,0 +1,47 @@
+.issue-list-container {
+  padding: 20px;
+}
+
+.issue-list-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.issue-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.issue-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.issue-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.issue-card h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #222;
+  font-size: 1.2em;
+}
+
+.issue-card p {
+  margin: 8px 0;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.issue-card p:last-child {
+  margin-bottom: 0;
+  color: #999;
+  font-size: 0.85em;
+}
+
