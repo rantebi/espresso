@@ -252,7 +252,9 @@ describe('Issues API Integration Tests', () => {
       expect(response.body.success).toBe(false);
       expect(response.body.error).toBe('Validation failed');
       expect(response.body.details).toBeDefined();
-      expect(response.body.details.some((d: any) => d.msg.includes('Page size must be between 1 and 100'))).toBe(true);
+      expect(response.body.details.some((d: any) => 
+        d.msg.includes('Page size') && d.msg.includes('at least 1')
+      )).toBe(true);
     });
 
     it('should return 400 when pageSize is greater than 100', async () => {
@@ -263,7 +265,9 @@ describe('Issues API Integration Tests', () => {
       expect(response.body.success).toBe(false);
       expect(response.body.error).toBe('Validation failed');
       expect(response.body.details).toBeDefined();
-      expect(response.body.details.some((d: any) => d.msg.includes('Page size must be between 1 and 100'))).toBe(true);
+      expect(response.body.details.some((d: any) => 
+        d.msg.includes('Page size') && d.msg.includes('at most 100')
+      )).toBe(true);
     });
 
     it('should return empty array when page exceeds total pages', async () => {

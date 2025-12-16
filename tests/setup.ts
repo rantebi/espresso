@@ -6,6 +6,7 @@ const TEST_DB_PATH = join(__dirname, 'test.db');
 
 // Set test database path before any imports that might use it
 process.env.DB_PATH = TEST_DB_PATH;
+process.env.NODE_ENV = 'test';
 
 // Initialize test database before all tests
 beforeAll(() => {
