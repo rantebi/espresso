@@ -34,29 +34,9 @@ export const getAllIssues = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Parse query params, handling undefined and NaN
-    const pageParam = req.query.page as string | undefined;
-    const pageSizeParam = req.query.pageSize as string | undefined;
-    
-    const page = pageParam !== undefined ? parseInt(pageParam, 10) : 1;
-    const pageSize = pageSizeParam !== undefined ? parseInt(pageSizeParam, 10) : 10;
-
-    // Validate pagination params
-    if (isNaN(page) || page < 1) {
-      res.status(400).json({
-        success: false,
-        error: 'Page must be greater than 0',
-      });
-      return;
-    }
-
-    if (isNaN(pageSize) || pageSize < 1 || pageSize > 100) {
-      res.status(400).json({
-        success: false,
-        error: 'Page size must be between 1 and 100',
-      });
-      return;
-    }
+    // Query params are validated and converted by middleware
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
 
     const result = await IssueModel.findAll(page, pageSize);
 
@@ -75,15 +55,8 @@ export const getIssueById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id = parseInt(req.params.id, 10);
-
-    if (isNaN(id)) {
-      res.status(400).json({
-        success: false,
-        error: 'Invalid issue ID',
-      });
-      return;
-    }
+    // ID is validated and converted by middleware
+    const id = Number(req.params.id);
 
     const issue = await IssueModel.findById(id);
 
@@ -106,15 +79,8 @@ export const updateIssue = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id = parseInt(req.params.id, 10);
-
-    if (isNaN(id)) {
-      res.status(400).json({
-        success: false,
-        error: 'Invalid issue ID',
-      });
-      return;
-    }
+    // ID is validated and converted by middleware
+    const id = Number(req.params.id);
 
     const updates: UpdateIssueInput = {};
     
@@ -144,15 +110,8 @@ export const deleteIssue = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const id = parseInt(req.params.id, 10);
-
-    if (isNaN(id)) {
-      res.status(400).json({
-        success: false,
-        error: 'Invalid issue ID',
-      });
-      return;
-    }
+    // ID is validated and converted by middleware
+    const id = Number(req.params.id);
 
     const deleted = await IssueModel.delete(id);
 

@@ -1,4 +1,4 @@
-import { body, ValidationChain, validationResult } from 'express-validator';
+import { body, param, query, ValidationChain, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 
 export const validateCreateIssue: ValidationChain[] = [
@@ -72,6 +72,28 @@ export const validateUpdateIssue: ValidationChain[] = [
     }
     return true;
   }),
+];
+
+export const validateIssueId: ValidationChain[] = [
+  param('id')
+    .notEmpty()
+    .withMessage('Issue ID is required')
+    .isInt({ min: 1 })
+    .withMessage('Issue ID must be a positive integer')
+    .toInt(),
+];
+
+export const validatePagination: ValidationChain[] = [
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Page must be a positive integer')
+    .toInt(),
+  query('pageSize')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Page size must be between 1 and 100')
+    .toInt(),
 ];
 
 export const handleValidationErrors = (

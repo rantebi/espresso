@@ -239,7 +239,9 @@ describe('Issues API Integration Tests', () => {
         .expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toBe('Page must be greater than 0');
+      expect(response.body.error).toBe('Validation failed');
+      expect(response.body.details).toBeDefined();
+      expect(response.body.details.some((d: any) => d.msg.includes('Page must be a positive integer'))).toBe(true);
     });
 
     it('should return 400 when pageSize is less than 1', async () => {
@@ -248,7 +250,9 @@ describe('Issues API Integration Tests', () => {
         .expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toBe('Page size must be between 1 and 100');
+      expect(response.body.error).toBe('Validation failed');
+      expect(response.body.details).toBeDefined();
+      expect(response.body.details.some((d: any) => d.msg.includes('Page size must be between 1 and 100'))).toBe(true);
     });
 
     it('should return 400 when pageSize is greater than 100', async () => {
@@ -257,7 +261,9 @@ describe('Issues API Integration Tests', () => {
         .expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toBe('Page size must be between 1 and 100');
+      expect(response.body.error).toBe('Validation failed');
+      expect(response.body.details).toBeDefined();
+      expect(response.body.details.some((d: any) => d.msg.includes('Page size must be between 1 and 100'))).toBe(true);
     });
 
     it('should return empty array when page exceeds total pages', async () => {
@@ -334,7 +340,9 @@ describe('Issues API Integration Tests', () => {
         .expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toBe('Invalid issue ID');
+      expect(response.body.error).toBe('Validation failed');
+      expect(response.body.details).toBeDefined();
+      expect(response.body.details.some((d: any) => d.msg.includes('Issue ID must be a positive integer'))).toBe(true);
     });
   });
 
@@ -470,7 +478,9 @@ describe('Issues API Integration Tests', () => {
         .expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toBe('Invalid issue ID');
+      expect(response.body.error).toBe('Validation failed');
+      expect(response.body.details).toBeDefined();
+      expect(response.body.details.some((d: any) => d.msg.includes('Issue ID must be a positive integer'))).toBe(true);
     });
   });
 

@@ -9,6 +9,8 @@ import {
 import {
   validateCreateIssue,
   validateUpdateIssue,
+  validateIssueId,
+  validatePagination,
   handleValidationErrors,
 } from '../middleware/validation';
 
@@ -21,18 +23,34 @@ router.post(
   createIssue
 );
 
-router.get('/issues', getAllIssues);
+router.get(
+  '/issues',
+  validatePagination,
+  handleValidationErrors,
+  getAllIssues
+);
 
-router.get('/issues/:id', getIssueById);
+router.get(
+  '/issues/:id',
+  validateIssueId,
+  handleValidationErrors,
+  getIssueById
+);
 
 router.put(
   '/issues/:id',
+  validateIssueId,
   validateUpdateIssue,
   handleValidationErrors,
   updateIssue
 );
 
-router.delete('/issues/:id', deleteIssue);
+router.delete(
+  '/issues/:id',
+  validateIssueId,
+  handleValidationErrors,
+  deleteIssue
+);
 
 export default router;
 
