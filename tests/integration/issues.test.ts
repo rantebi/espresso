@@ -253,7 +253,7 @@ describe('Issues API Integration Tests', () => {
       expect(response.body.error).toBe('Validation failed');
       expect(response.body.details).toBeDefined();
       expect(response.body.details.some((d: any) => 
-        d.msg.includes('Page size') && d.msg.includes('at least 1')
+        d.msg.includes('Page size must be at least 1')
       )).toBe(true);
     });
 
@@ -266,7 +266,7 @@ describe('Issues API Integration Tests', () => {
       expect(response.body.error).toBe('Validation failed');
       expect(response.body.details).toBeDefined();
       expect(response.body.details.some((d: any) => 
-        d.msg.includes('Page size') && d.msg.includes('at most 100')
+        d.msg.includes('Page size must be at most 100')
       )).toBe(true);
     });
 

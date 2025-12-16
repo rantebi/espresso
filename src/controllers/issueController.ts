@@ -34,9 +34,9 @@ export const getAllIssues = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // Query params are validated and converted by middleware
-    const page = req.query.page ? Number(req.query.page) : 1;
-    const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
+    // Query params are validated and converted by middleware (with defaults applied)
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
 
     const result = await IssueModel.findAll(page, pageSize);
 
