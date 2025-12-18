@@ -55,8 +55,7 @@ export const getIssueById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // ID is validated and converted by middleware
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     const issue = await IssueModel.findById(id);
 
@@ -79,8 +78,7 @@ export const updateIssue = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // ID is validated and converted by middleware
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     const updates: UpdateIssueInput = {};
     
@@ -110,8 +108,7 @@ export const deleteIssue = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    // ID is validated and converted by middleware
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     const deleted = await IssueModel.delete(id);
 

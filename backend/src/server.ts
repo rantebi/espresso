@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { initializeDatabase, closeDatabase } from './config/database';
+import { initializeDatabase } from './config/dynamodb';
 import apiRoutes from './routes/api';
 import { errorHandler } from './middleware/errorHandler';
 
@@ -49,7 +49,6 @@ if (process.env.NODE_ENV !== 'test') {
     if (server) {
       server.close(() => {
         console.log('HTTP server closed');
-        closeDatabase();
         process.exit(0);
       });
     }
@@ -60,7 +59,6 @@ if (process.env.NODE_ENV !== 'test') {
     if (server) {
       server.close(() => {
         console.log('HTTP server closed');
-        closeDatabase();
         process.exit(0);
       });
     }

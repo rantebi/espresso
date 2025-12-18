@@ -51,18 +51,16 @@ export const updateIssueSchema = z
     message: 'At least one field must be provided for update. Received empty body',
   });
 
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export const issueIdSchema = z.object({
   id: z
     .string()
     .min(1, 'Issue ID is required')
     .refine(
-      (val) => {
-        const num = Number(val);
-        return !isNaN(num) && num >= 1 && Number.isInteger(num);
-      },
-      `Issue ID must be a positive integer`
-    )
-    .transform((val) => Number(val)),
+      (val) => uuidRegex.test(val),
+      `Issue ID must be a valid UUID`
+    ),
 });
 
 export const paginationSchema = z.object({

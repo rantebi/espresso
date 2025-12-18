@@ -1,98 +1,97 @@
-import { getDatabase } from '../config/database';
+import { dynamoDBClient, TABLE_NAME } from '../config/dynamodb';
 import { Issue, CreateIssueInput, UpdateIssueInput, PaginatedResponse } from '../types';
+import { v4 as uuidv4 } from 'uuid';
 
 export class IssueModel {
-  private get db() {
-    return getDatabase();
-  }
-
   async create(input: CreateIssueInput): Promise<Issue> {
+    const id = uuidv4();
     const status = input.status || 'open';
-    
-    const stmt = this.db.prepare(`
-      INSERT INTO issues (title, description, site, severity, status)
-      VALUES (?, ?, ?, ?, ?)
-    `);
+    const now = new Date().toISOString();
 
-    const result = stmt.run(
-      input.title,
-      input.description,
-      input.site,
-      input.severity,
-      status
-    );
+    const issue: Issue = {
+      id,
+      title: input.title,
+      description: input.description,
+      site: input.site,
+      severity: input.severity,
+      status,
+      createdAt: now,
+      updatedAt: now,
+    };
 
-    const issue = await this.findById(result.lastInsertRowid as number);
-    if (!issue) {
-      throw new Error('Failed to create issue');
-    }
+    await dynamoDBClient.put({
+      TableName: TABLE_NAME,
+      Item: issue,
+    });
 
     return issue;
   }
 
-  async findById(id: number): Promise<Issue | null> {
-    const stmt = this.db.prepare('SELECT * FROM issues WHERE id = ?');
-    const row = stmt.get(id) as any;
+  async findById(id: string): Promise<Issue | null> {
+    const result = await dynamoDBClient.get({
+      TableName: TABLE_NAME,
+      Key: { id },
+    });
 
-    if (!row) {
+    if (!result.Item) {
       return null;
     }
 
-    return {
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      site: row.site,
-      severity: row.severity,
-      status: row.status,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    };
+    return result.Item as Issue;
   }
 
-  async update(id: number, updates: UpdateIssueInput): Promise<Issue> {
+  async update(id: string, updates: UpdateIssueInput): Promise<Issue> {
     const existing = await this.findById(id);
     if (!existing) {
       throw new Error('Issue not found');
     }
 
-    const fields: string[] = [];
-    const values: any[] = [];
+    const updateExpression: string[] = [];
+    const expressionAttributeNames: Record<string, string> = {};
+    const expressionAttributeValues: Record<string, any> = {};
 
     if (updates.title !== undefined) {
-      fields.push('title = ?');
-      values.push(updates.title);
+      updateExpression.push('#title = :title');
+      expressionAttributeNames['#title'] = 'title';
+      expressionAttributeValues[':title'] = updates.title;
     }
     if (updates.description !== undefined) {
-      fields.push('description = ?');
-      values.push(updates.description);
+      updateExpression.push('#description = :description');
+      expressionAttributeNames['#description'] = 'description';
+      expressionAttributeValues[':description'] = updates.description;
     }
     if (updates.site !== undefined) {
-      fields.push('site = ?');
-      values.push(updates.site);
+      updateExpression.push('#site = :site');
+      expressionAttributeNames['#site'] = 'site';
+      expressionAttributeValues[':site'] = updates.site;
     }
     if (updates.severity !== undefined) {
-      fields.push('severity = ?');
-      values.push(updates.severity);
+      updateExpression.push('#severity = :severity');
+      expressionAttributeNames['#severity'] = 'severity';
+      expressionAttributeValues[':severity'] = updates.severity;
     }
     if (updates.status !== undefined) {
-      fields.push('status = ?');
-      values.push(updates.status);
+      updateExpression.push('#status = :status');
+      expressionAttributeNames['#status'] = 'status';
+      expressionAttributeValues[':status'] = updates.status;
     }
 
-    if (fields.length === 0) {
+    if (updateExpression.length === 0) {
       return existing;
     }
 
-    fields.push('updatedAt = CURRENT_TIMESTAMP');
+    // Always update updatedAt
+    updateExpression.push('#updatedAt = :updatedAt');
+    expressionAttributeNames['#updatedAt'] = 'updatedAt';
+    expressionAttributeValues[':updatedAt'] = new Date().toISOString();
 
-    const stmt = this.db.prepare(`
-      UPDATE issues 
-      SET ${fields.join(', ')}
-      WHERE id = ?
-    `);
-
-    stmt.run(...values, id);
+    await dynamoDBClient.update({
+      TableName: TABLE_NAME,
+      Key: { id },
+      UpdateExpression: `SET ${updateExpression.join(', ')}`,
+      ExpressionAttributeNames: expressionAttributeNames,
+      ExpressionAttributeValues: expressionAttributeValues,
+    });
 
     const updated = await this.findById(id);
     if (!updated) {
@@ -102,41 +101,36 @@ export class IssueModel {
     return updated;
   }
 
-  async delete(id: number): Promise<boolean> {
-    const stmt = this.db.prepare('DELETE FROM issues WHERE id = ?');
-    const result = stmt.run(id);
-    return result.changes > 0;
+  async delete(id: string): Promise<boolean> {
+    const result = await dynamoDBClient.delete({
+      TableName: TABLE_NAME,
+      Key: { id },
+      ReturnValues: 'ALL_OLD',
+    });
+
+    return !!result.Attributes;
   }
 
   async findAll(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<Issue>> {
+    // Scan the table (for small datasets, this is fine)
+    // For larger datasets, consider using GSI or query patterns
+    const result = await dynamoDBClient.scan({
+      TableName: TABLE_NAME,
+    });
+
+    const allIssues = (result.Items || []) as Issue[];
+
+    // Sort by createdAt descending
+    allIssues.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    // Calculate pagination
+    const total = allIssues.length;
     const offset = (page - 1) * pageSize;
-    
-    // Get total count
-    const countStmt = this.db.prepare('SELECT COUNT(*) as total FROM issues');
-    const countResult = countStmt.get() as { total: number };
-    const total = countResult.total;
-    
-    // Get paginated issues, ordered by createdAt DESC
-    const stmt = this.db.prepare(`
-      SELECT * FROM issues 
-      ORDER BY createdAt DESC 
-      LIMIT ? OFFSET ?
-    `);
-    const rows = stmt.all(pageSize, offset) as any[];
-    
-    const issues: Issue[] = rows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      description: row.description,
-      site: row.site,
-      severity: row.severity,
-      status: row.status,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    }));
-    
+    const issues = allIssues.slice(offset, offset + pageSize);
     const totalPages = Math.ceil(total / pageSize);
-    
+
     return {
       data: issues,
       pagination: {
@@ -150,4 +144,3 @@ export class IssueModel {
 }
 
 export default new IssueModel();
-
