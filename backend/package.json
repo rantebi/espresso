@@ -6,13 +6,13 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "DYNAMODB_ENDPOINT=http://localhost:8000 DYNAMODB_TABLE=issues ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "seed": "ts-node src/scripts/seed-dynamodb.ts",
     "dynamodb:start": "../scripts/start-dynamodb-local.sh",
-    "dynamodb:create-table": "../scripts/create-dynamodb-table.sh",
-    "dynamodb:setup": "npm run dynamodb:start && sleep 2 && npm run dynamodb:create-table"
+    "dynamodb:create-table": "ts-node src/scripts/create-dynamodb-table.ts",
+    "dynamodb:setup": "npm run dynamodb:start && sleep 3 && npm run dynamodb:create-table"
   },
   "keywords": [],
   "author": "",

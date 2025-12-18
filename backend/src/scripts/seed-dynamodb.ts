@@ -1,6 +1,7 @@
 import { dynamoDBClient, TABLE_NAME, initializeDatabase } from '../config/dynamodb';
 import { Issue } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { PutCommand } from '@aws-sdk/lib-dynamodb';
 
 const dummyIssues: Omit<Issue, 'id' | 'createdAt' | 'updatedAt'>[] = [
   {
@@ -77,10 +78,12 @@ async function seedDatabase(): Promise<void> {
         updatedAt: now,
       };
 
-      await dynamoDBClient.put({
-        TableName: TABLE_NAME,
-        Item: fullIssue,
-      });
+      await dynamoDBClient.send(
+        new PutCommand({
+          TableName: TABLE_NAME,
+          Item: fullIssue,
+        })
+      );
 
       console.log(`✓ Created issue: ${fullIssue.title} (${id})`);
     }

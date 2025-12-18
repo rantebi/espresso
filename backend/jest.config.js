@@ -11,6 +11,13 @@ module.exports = {
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts'
-  ]
+  ],
+  testEnvironmentOptions: {
+    env: {
+      NODE_ENV: 'test',
+      DYNAMODB_ENDPOINT: 'http://localhost:8000',
+      DYNAMODB_TABLE: 'issues-test'
+    }
+  }
 };
 

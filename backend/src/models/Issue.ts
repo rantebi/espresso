@@ -1,6 +1,7 @@
 import { dynamoDBClient, TABLE_NAME } from '../config/dynamodb';
 import { Issue, CreateIssueInput, UpdateIssueInput, PaginatedResponse } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { PutCommand, GetCommand, UpdateCommand, DeleteCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 
 export class IssueModel {
   async create(input: CreateIssueInput): Promise<Issue> {
@@ -19,19 +20,23 @@ export class IssueModel {
       updatedAt: now,
     };
 
-    await dynamoDBClient.put({
-      TableName: TABLE_NAME,
-      Item: issue,
-    });
+    await dynamoDBClient.send(
+      new PutCommand({
+        TableName: TABLE_NAME,
+        Item: issue,
+      })
+    );
 
     return issue;
   }
 
   async findById(id: string): Promise<Issue | null> {
-    const result = await dynamoDBClient.get({
-      TableName: TABLE_NAME,
-      Key: { id },
-    });
+    const result = await dynamoDBClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { id },
+      })
+    );
 
     if (!result.Item) {
       return null;
@@ -85,13 +90,15 @@ export class IssueModel {
     expressionAttributeNames['#updatedAt'] = 'updatedAt';
     expressionAttributeValues[':updatedAt'] = new Date().toISOString();
 
-    await dynamoDBClient.update({
-      TableName: TABLE_NAME,
-      Key: { id },
-      UpdateExpression: `SET ${updateExpression.join(', ')}`,
-      ExpressionAttributeNames: expressionAttributeNames,
-      ExpressionAttributeValues: expressionAttributeValues,
-    });
+    await dynamoDBClient.send(
+      new UpdateCommand({
+        TableName: TABLE_NAME,
+        Key: { id },
+        UpdateExpression: `SET ${updateExpression.join(', ')}`,
+        ExpressionAttributeNames: expressionAttributeNames,
+        ExpressionAttributeValues: expressionAttributeValues,
+      })
+    );
 
     const updated = await this.findById(id);
     if (!updated) {
@@ -102,11 +109,13 @@ export class IssueModel {
   }
 
   async delete(id: string): Promise<boolean> {
-    const result = await dynamoDBClient.delete({
-      TableName: TABLE_NAME,
-      Key: { id },
-      ReturnValues: 'ALL_OLD',
-    });
+    const result = await dynamoDBClient.send(
+      new DeleteCommand({
+        TableName: TABLE_NAME,
+        Key: { id },
+        ReturnValues: 'ALL_OLD',
+      })
+    );
 
     return !!result.Attributes;
   }
@@ -114,9 +123,11 @@ export class IssueModel {
   async findAll(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<Issue>> {
     // Scan the table (for small datasets, this is fine)
     // For larger datasets, consider using GSI or query patterns
-    const result = await dynamoDBClient.scan({
-      TableName: TABLE_NAME,
-    });
+    const result = await dynamoDBClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+      })
+    );
 
     const allIssues = (result.Items || []) as Issue[];
 

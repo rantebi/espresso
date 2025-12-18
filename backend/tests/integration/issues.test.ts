@@ -1,6 +1,5 @@
 import request from 'supertest';
 import app, { server } from '../../src/server';
-import { closeDatabase } from '../../src/config/database';
 
 describe('Issues API Integration Tests', () => {
   // Cleanup after all tests
@@ -8,11 +7,9 @@ describe('Issues API Integration Tests', () => {
     // Close server if it exists (shouldn't in test mode, but be safe)
     if (server) {
       server.close(() => {
-        closeDatabase();
         done();
       });
     } else {
-      closeDatabase();
       done();
     }
   });
@@ -33,7 +30,9 @@ describe('Issues API Integration Tests', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toBeDefined();
-      expect(response.body.data.id).toBeGreaterThan(0);
+      expect(response.body.data.id).toBeDefined();
+      expect(typeof response.body.data.id).toBe('string');
+      expect(response.body.data.id.length).toBeGreaterThan(0);
       expect(response.body.data.title).toBe(issueData.title);
       expect(response.body.data.description).toBe(issueData.description);
       expect(response.body.data.site).toBe(issueData.site);
@@ -331,7 +330,7 @@ describe('Issues API Integration Tests', () => {
 
     it('should return 404 when issue does not exist', async () => {
       const response = await request(app)
-        .get('/api/issues/99999')
+        .get('/api/issues/550e8400-e29b-41d4-a716-446655440000')
         .expect(404);
 
       expect(response.body.success).toBe(false);
@@ -346,7 +345,7 @@ describe('Issues API Integration Tests', () => {
       expect(response.body.success).toBe(false);
       expect(response.body.error).toBe('Validation failed');
       expect(response.body.details).toBeDefined();
-      expect(response.body.details.some((d: any) => d.msg.includes('Issue ID must be a positive integer'))).toBe(true);
+      expect(response.body.details.some((d: any) => d.msg.includes('Issue ID must be a valid UUID'))).toBe(true);
     });
   });
 
@@ -382,7 +381,7 @@ describe('Issues API Integration Tests', () => {
 
     it('should return 404 when updating non-existent issue', async () => {
       const response = await request(app)
-        .put('/api/issues/99999')
+        .put('/api/issues/550e8400-e29b-41d4-a716-446655440000')
         .send({
           title: 'Updated Title',
         })
@@ -469,7 +468,7 @@ describe('Issues API Integration Tests', () => {
 
     it('should return 404 when deleting non-existent issue', async () => {
       const response = await request(app)
-        .delete('/api/issues/99999')
+        .delete('/api/issues/550e8400-e29b-41d4-a716-446655440000')
         .expect(404);
 
       expect(response.body.success).toBe(false);
@@ -484,7 +483,7 @@ describe('Issues API Integration Tests', () => {
       expect(response.body.success).toBe(false);
       expect(response.body.error).toBe('Validation failed');
       expect(response.body.details).toBeDefined();
-      expect(response.body.details.some((d: any) => d.msg.includes('Issue ID must be a positive integer'))).toBe(true);
+      expect(response.body.details.some((d: any) => d.msg.includes('Issue ID must be a valid UUID'))).toBe(true);
     });
   });
 

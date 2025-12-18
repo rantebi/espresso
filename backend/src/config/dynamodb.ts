@@ -2,7 +2,11 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 
 // Get DynamoDB endpoint from environment (for local development with DynamoDB Local)
-const endpoint = process.env.DYNAMODB_ENDPOINT || undefined;
+// Default to DynamoDB Local if NODE_ENV is development or test and endpoint is not set
+const endpoint = process.env.DYNAMODB_ENDPOINT || 
+  (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test' 
+    ? 'http://localhost:8000' 
+    : undefined);
 const region = process.env.AWS_REGION || 'us-east-1';
 
 // Create DynamoDB client
@@ -19,7 +23,16 @@ const client = new DynamoDBClient({
 });
 
 // Create DynamoDB Document Client (simplified API)
-export const dynamoDBClient = DynamoDBDocumentClient.from(client);
+// Using from() with explicit configuration to ensure proper typing
+export const dynamoDBClient = DynamoDBDocumentClient.from(client, {
+  marshallOptions: {
+    removeUndefinedValues: true,
+    convertEmptyValues: false,
+  },
+  unmarshallOptions: {
+    wrapNumbers: false,
+  },
+});
 
 // Table name from environment or default
 export const TABLE_NAME = process.env.DYNAMODB_TABLE || 'issues';

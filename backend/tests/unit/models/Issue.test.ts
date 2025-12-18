@@ -14,7 +14,9 @@ describe('Issue Model', () => {
       const issue = await IssueModel.create(input);
 
       expect(issue).toBeDefined();
-      expect(issue.id).toBeGreaterThan(0);
+      expect(issue.id).toBeDefined();
+      expect(typeof issue.id).toBe('string');
+      expect(issue.id.length).toBeGreaterThan(0);
       expect(issue.title).toBe(input.title);
       expect(issue.description).toBe(input.description);
       expect(issue.site).toBe(input.site);
@@ -57,7 +59,7 @@ describe('Issue Model', () => {
     });
 
     it('should return null when issue does not exist', async () => {
-      const found = await IssueModel.findById(99999);
+      const found = await IssueModel.findById('non-existent-id-12345');
       expect(found).toBeNull();
     });
   });
@@ -74,8 +76,8 @@ describe('Issue Model', () => {
       const created = await IssueModel.create(input);
       const originalUpdatedAt = created.updatedAt;
 
-      // Wait a bit to ensure timestamp difference (SQLite has second precision)
-      await new Promise((resolve) => setTimeout(resolve, 1100));
+      // Wait a bit to ensure timestamp difference
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       const updated = await IssueModel.update(created.id, {
         title: 'Updated Title',
@@ -92,7 +94,7 @@ describe('Issue Model', () => {
 
     it('should throw error when updating non-existent issue', async () => {
       await expect(
-        IssueModel.update(99999, { title: 'New Title' })
+        IssueModel.update('non-existent-id-12345', { title: 'New Title' })
       ).rejects.toThrow('Issue not found');
     });
 
@@ -135,7 +137,7 @@ describe('Issue Model', () => {
     });
 
     it('should return false when deleting non-existent issue', async () => {
-      const deleted = await IssueModel.delete(99999);
+      const deleted = await IssueModel.delete('non-existent-id-12345');
       expect(deleted).toBe(false);
     });
   });

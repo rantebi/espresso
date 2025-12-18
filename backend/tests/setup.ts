@@ -1,105 +1,122 @@
-import { initializeDatabase, getDatabase, closeDatabase } from '../src/config/database';
-import { join } from 'path';
-import { unlinkSync, existsSync, chmodSync } from 'fs';
-
-const TEST_DB_PATH = join(__dirname, 'test.db');
-
-// Set test database path before any imports that might use it
-process.env.DB_PATH = TEST_DB_PATH;
+// Set test environment variables BEFORE any imports that might use them
+// This is critical - the dynamodb config reads env vars at module load time
 process.env.NODE_ENV = 'test';
+process.env.DYNAMODB_ENDPOINT = process.env.DYNAMODB_ENDPOINT || 'http://localhost:8000';
+process.env.DYNAMODB_TABLE = process.env.DYNAMODB_TABLE || 'issues-test';
 
-// Initialize test database before all tests
-beforeAll(() => {
-  // Force close any existing database connection (from server import or previous tests)
-  try {
-    closeDatabase();
-  } catch (error) {
-    // Ignore
-  }
-  
-  // Remove test database if it exists
-  if (existsSync(TEST_DB_PATH)) {
-    try {
-      unlinkSync(TEST_DB_PATH);
-    } catch (error) {
-      // Ignore if can't delete (might be in use)
-    }
-  }
-  
-  // Initialize with test database path
-  const db = initializeDatabase(TEST_DB_PATH);
-  
-  // Ensure database file has write permissions
-  try {
-    if (existsSync(TEST_DB_PATH)) {
-      chmodSync(TEST_DB_PATH, 0o666);
-    }
-  } catch (error) {
-    // Ignore permission errors
-  }
-  
-  // Verify database is open and working (test write)
-  try {
-    const testStmt = db.prepare('CREATE TABLE IF NOT EXISTS test_write (id INTEGER)');
-    testStmt.run();
-    db.prepare('DROP TABLE IF EXISTS test_write').run();
-  } catch (error) {
-    console.error('Database write verification failed:', error);
-    throw error;
-  }
+import { initializeDatabase, dynamoDBClient, TABLE_NAME } from '../src/config/dynamodb';
+import { DynamoDBClient, CreateTableCommand, DescribeTableCommand } from '@aws-sdk/client-dynamodb';
+import { ScanCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+
+const testEndpoint = process.env.DYNAMODB_ENDPOINT;
+const testTableName = process.env.DYNAMODB_TABLE;
+
+// Create a separate DynamoDB client for table operations (not document client)
+const dynamoDBTableClient = new DynamoDBClient({
+  region: 'us-east-1',
+  endpoint: testEndpoint,
+  credentials: {
+    accessKeyId: 'dummy',
+    secretAccessKey: 'dummy',
+  },
 });
 
-// Clean database before each test
-beforeEach(() => {
-  let db = getDatabase();
-  
-  // Clean the table, retry if we get a readonly error
+// Initialize test database before all tests
+beforeAll(async () => {
+  // Initialize DynamoDB connection
+  initializeDatabase();
+
+  // Create table if it doesn't exist
   try {
-    db.prepare('DELETE FROM issues').run();
+    await dynamoDBTableClient.send(
+      new DescribeTableCommand({
+        TableName: testTableName,
+      })
+    );
+    console.log(`Test table ${testTableName} already exists`);
   } catch (error: any) {
-    // If we get a readonly error, close and reinitialize
-    if (error?.code === 'SQLITE_READONLY' || error?.message?.includes('readonly') || error?.message?.includes('read-only')) {
+    // Table doesn't exist, create it
+    if (error.name === 'ResourceNotFoundException') {
       try {
-        closeDatabase();
-      } catch (closeError) {
-        // Ignore close errors
+        await dynamoDBTableClient.send(
+          new CreateTableCommand({
+            TableName: testTableName,
+            AttributeDefinitions: [
+              {
+                AttributeName: 'id',
+                AttributeType: 'S',
+              },
+            ],
+            KeySchema: [
+              {
+                AttributeName: 'id',
+                KeyType: 'HASH',
+              },
+            ],
+            BillingMode: 'PAY_PER_REQUEST',
+          })
+        );
+        console.log(`Test table ${testTableName} created successfully`);
+      } catch (createError: any) {
+        console.error('Failed to create test table:', createError.message);
+        throw createError;
       }
-      
-      // Remove and recreate the database file
-      if (existsSync(TEST_DB_PATH)) {
-        try {
-          unlinkSync(TEST_DB_PATH);
-        } catch (unlinkError) {
-          // Ignore
-        }
-      }
-      
-      // Reinitialize
-      db = initializeDatabase(TEST_DB_PATH);
-      
-      // Try again
-      db.prepare('DELETE FROM issues').run();
     } else {
       throw error;
     }
   }
 });
 
-// Close database after all tests
-afterAll(() => {
+// Clean database before each test (delete all items)
+beforeEach(async () => {
   try {
-    closeDatabase();
-  } catch (error) {
-    // Ignore close errors
-  }
-  
-  // Clean up test database file
-  if (existsSync(TEST_DB_PATH)) {
-    try {
-      unlinkSync(TEST_DB_PATH);
-    } catch (error) {
-      // Ignore if can't delete
+    // Scan all items from the table
+    const scanResult = await dynamoDBClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+      })
+    );
+
+    // Delete all items in batches to avoid overwhelming DynamoDB Local
+    if (scanResult.Items && scanResult.Items.length > 0) {
+      const deletePromises = scanResult.Items.map((item: any) => {
+        if (!item || !item.id) {
+          return Promise.resolve();
+        }
+        return dynamoDBClient.send(
+          new DeleteCommand({
+            TableName: TABLE_NAME,
+            Key: { id: item.id },
+          })
+        ).catch((err) => {
+          // Silently ignore individual delete errors
+          return null;
+        });
+      });
+      await Promise.all(deletePromises);
     }
+  } catch (error: any) {
+    // Silently ignore cleanup errors - table might not exist or be empty
+    // This is expected in some test scenarios
   }
 });
 
+// Cleanup after all tests (optional - table can remain for next test run)
+afterAll(async () => {
+  // DynamoDB Local doesn't require explicit cleanup
+  // The table can remain for faster subsequent test runs
+  // If you want to delete the table, uncomment below:
+  /*
+  try {
+    await dynamoDBClient.send(
+      new DeleteTableCommand({
+        TableName: TABLE_NAME,
+      })
+    );
+    console.log(`Test table ${TABLE_NAME} deleted`);
+  } catch (error: any) {
+    // Ignore if table doesn't exist or can't be deleted
+    console.log(`Could not delete test table: ${error.message}`);
+  }
+  */
+});
