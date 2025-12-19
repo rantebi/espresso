@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { initializeDatabase } from './config/dynamodb';
 import apiRoutes from './routes/api';
 import { errorHandler } from './middleware/errorHandler';
+import { parseBody } from './middleware/bodyParser';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,8 +10,14 @@ const PORT = process.env.PORT || 3000;
 // Initialize database
 initializeDatabase();
 
-// Middleware
-app.use(express.json());
+// Body parsing middleware - must come before routes
+// Increase limit for larger payloads and ensure proper parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Additional body parsing for serverless-http compatibility
+// Handles cases where body comes as string or Buffer
+app.use(parseBody);
 
 // CORS middleware (allow all origins for development)
 app.use((req: Request, res: Response, next) => {
