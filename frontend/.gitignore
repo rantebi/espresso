@@ -19,3 +19,7 @@ jspm_packages/
 dist/
 
 .DS_Store
+
+# Deployment
+.env.production
+.env.local

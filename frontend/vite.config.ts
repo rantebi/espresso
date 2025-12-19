@@ -6,5 +6,9 @@ export default defineConfig({
   server: {
     port: 5173, // Default Vite port
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+  },
 });
 
