@@ -72,7 +72,19 @@ router.delete(
 
 router.post(
   '/issues/upload',
-  upload.single('csv'),
+  (req, res, next) => {
+    upload.single('csv')(req, res, (err) => {
+      if (err) {
+        // Handle multer errors (e.g., file filter rejection)
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid file',
+          message: err.message || 'Only CSV files are allowed',
+        });
+      }
+      next();
+    });
+  },
   uploadIssuesFromCSV
 );
 

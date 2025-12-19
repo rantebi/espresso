@@ -50,6 +50,8 @@ export const uploadIssuesFromCSV = async (
       columns: true,
       skip_empty_lines: true,
       trim: true,
+      relax_column_count: true, // Allow rows with different column counts
+      relax_quotes: true, // Allow unquoted values with quotes
     }) as Array<Record<string, string>>;
 
     if (records.length === 0) {
