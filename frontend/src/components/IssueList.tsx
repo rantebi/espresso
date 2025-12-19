@@ -36,7 +36,6 @@ const IssueList: React.FC<IssueListProps> = ({ initialPageSize = 10 }) => {
   // Reset page to 1 when queryKey changes (filters/sort changed)
   useEffect(() => {
     setPage(1);
-    setIssues([]);
     setHasMore(true);
   }, [queryKey]);
 
