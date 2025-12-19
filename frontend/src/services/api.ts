@@ -57,3 +57,31 @@ export const createIssue = async (input: CreateIssueInput): Promise<Issue> => {
   return response.data.data;
 };
 
+export interface UploadIssuesResponse {
+  total: number;
+  created: number;
+  failed: number;
+  issues: Issue[];
+  errors: Array<{
+    row: number;
+    error: string;
+    data: any;
+  }>;
+}
+
+export const uploadIssuesFromCSV = async (file: File): Promise<UploadIssuesResponse> => {
+  const formData = new FormData();
+  formData.append('csv', file);
+
+  const response = await api.post<ApiResponse<UploadIssuesResponse>>(
+    '/issues/upload',
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
+  return response.data.data;
+};
+

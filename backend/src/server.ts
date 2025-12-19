@@ -15,6 +15,8 @@ initializeDatabase();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Note: Multer for file uploads is configured in routes/api.ts
+
 // Additional body parsing for serverless-http compatibility
 // Handles cases where body comes as string or Buffer
 app.use(parseBody);

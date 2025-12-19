@@ -18,6 +18,7 @@ export interface CreateIssueInput {
   site: string;
   severity: Severity;
   status?: Status; // defaults to 'open'
+  createdAt?: string; // defaults to current time
 }
 
 export interface UpdateIssueInput {

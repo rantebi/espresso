@@ -20,7 +20,9 @@
   "license": "ISC",
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
+    "@types/papaparse": "^5.5.2",
     "axios": "^1.13.2",
+    "papaparse": "^5.5.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-router-dom": "^7.10.1"

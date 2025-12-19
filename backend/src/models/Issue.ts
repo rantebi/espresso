@@ -8,6 +8,8 @@ export class IssueModel {
     const id = uuidv4();
     const status = input.status || 'open';
     const now = new Date().toISOString();
+    // Use provided createdAt if available, otherwise use current time
+    const createdAt = input.createdAt || now;
 
     const issue: Issue = {
       id,
@@ -16,7 +18,7 @@ export class IssueModel {
       site: input.site,
       severity: input.severity,
       status,
-      createdAt: now,
+      createdAt,
       updatedAt: now,
     };
 

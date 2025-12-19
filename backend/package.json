@@ -30,19 +30,22 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.700.0",
     "@aws-sdk/lib-dynamodb": "^3.700.0",
+    "@types/multer": "^2.0.0",
+    "csv-parse": "^6.1.0",
     "express": "^5.2.1",
+    "multer": "^2.0.2",
     "serverless-http": "^3.2.0",
-    "zod": "^4.2.1",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
-    "serverless": "^3.40.0",
-    "@types/uuid": "^10.0.0",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.0.1",
     "@types/supertest": "^6.0.3",
+    "@types/uuid": "^10.0.0",
     "jest": "^30.2.0",
+    "serverless": "^3.40.0",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.6",
     "ts-node-dev": "^2.0.0",
