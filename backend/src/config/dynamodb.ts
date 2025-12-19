@@ -12,7 +12,7 @@ const region = process.env.AWS_REGION || 'us-east-1';
 // Create DynamoDB client
 const client = new DynamoDBClient({
   region,
-  endpoint, // If set, will use DynamoDB Local
+  endpoint, // If empty endpoint, use AWS DynamoDB with IAM role for lambdas
   credentials: endpoint
     ? {
         // Dummy credentials for DynamoDB Local
