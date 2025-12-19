@@ -9,7 +9,7 @@ import './DataTable.css';
 
 export interface Column<T> {
   key: keyof T | string;
-  header: string;
+  header: string | React.ReactNode;
   render?: (value: any, row: T) => React.ReactNode;
   className?: string;
 }
@@ -45,7 +45,7 @@ function DataTable<T extends Record<string, any>>({
       columns.map((col) => ({
         id: String(col.key),
         accessorKey: typeof col.key === 'string' ? col.key : String(col.key),
-        header: col.header,
+        header: typeof col.header === 'string' ? col.header : () => col.header,
         cell: ({ row, getValue }) => {
           const value = getValue();
           return col.render ? col.render(value, row.original) : String(value ?? '');

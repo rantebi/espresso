@@ -120,7 +120,17 @@ export class IssueModel {
     return !!result.Attributes;
   }
 
-  async findAll(page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<Issue>> {
+  async findAll(
+    page: number = 1,
+    pageSize: number = 10,
+    options?: {
+      search?: string;
+      status?: string;
+      severity?: string;
+      sortBy?: 'createdAt' | 'status' | 'severity';
+      sortOrder?: 'asc' | 'desc';
+    }
+  ): Promise<PaginatedResponse<Issue>> {
     // Scan the table (for small datasets, this is fine)
     // For larger datasets, consider using GSI or query patterns
     const result = await dynamoDBClient.send(
@@ -129,11 +139,49 @@ export class IssueModel {
       })
     );
 
-    const allIssues = (result.Items || []) as Issue[];
+    let allIssues = (result.Items || []) as Issue[];
 
-    // Sort by createdAt descending
+    // Apply search filter (case-insensitive title search)
+    if (options?.search) {
+      const searchLower = options.search.toLowerCase();
+      allIssues = allIssues.filter((issue) =>
+        issue.title.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply status filter
+    if (options?.status) {
+      allIssues = allIssues.filter((issue) => issue.status === options.status);
+    }
+
+    // Apply severity filter
+    if (options?.severity) {
+      allIssues = allIssues.filter((issue) => issue.severity === options.severity);
+    }
+
+    // Apply sorting
+    const sortBy = options?.sortBy || 'createdAt';
+    const sortOrder = options?.sortOrder || 'desc';
+
     allIssues.sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      let comparison = 0;
+
+      if (sortBy === 'createdAt') {
+        comparison =
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortBy === 'status') {
+        comparison = a.status.localeCompare(b.status);
+      } else if (sortBy === 'severity') {
+        // Custom severity order: critical > major > minor
+        const severityOrder: Record<string, number> = {
+          critical: 3,
+          major: 2,
+          minor: 1,
+        };
+        comparison = severityOrder[a.severity] - severityOrder[b.severity];
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
     });
 
     // Calculate pagination

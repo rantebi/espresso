@@ -5,7 +5,7 @@ import './Home.css';
 const Home: React.FC = () => {
   return (
     <div className="home-page">
-      <h1>Welcome to the Trial Issue Log</h1>
+      <h1>Trial Issue Log</h1>
       <IssueList />
     </div>
   );

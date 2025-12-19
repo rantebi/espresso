@@ -12,12 +12,29 @@ interface ApiResponse<T> {
   data: T;
 }
 
+export interface GetIssuesParams {
+  page: number;
+  pageSize?: number;
+  search?: string;
+  status?: 'open' | 'in_progress' | 'resolved';
+  severity?: 'minor' | 'major' | 'critical';
+  sortBy?: 'createdAt' | 'status' | 'severity';
+  sortOrder?: 'asc' | 'desc';
+}
+
 export const getIssues = async (
-  page: number,
-  pageSize: number = 10
+  params: GetIssuesParams
 ): Promise<PaginatedResponse<Issue>> => {
   const response = await api.get<ApiResponse<PaginatedResponse<Issue>>>('/issues', {
-    params: { page, pageSize },
+    params: {
+      page: params.page,
+      pageSize: params.pageSize || 10,
+      ...(params.search && { search: params.search }),
+      ...(params.status && { status: params.status }),
+      ...(params.severity && { severity: params.severity }),
+      ...(params.sortBy && { sortBy: params.sortBy }),
+      ...(params.sortOrder && { sortOrder: params.sortOrder }),
+    },
   });
 
   // Backend returns { success, data: { data: Issue[], pagination } }

@@ -113,6 +113,20 @@ export const paginationSchema = z.object({
       }
     })
     .transform((val) => (val ? Number(val) : 10)),
+  search: z
+    .string()
+    .optional()
+    .transform((val) => (val && val.trim() ? val.trim() : undefined)),
+  status: statusSchema.optional(),
+  severity: severitySchema.optional(),
+  sortBy: z
+    .enum(['createdAt', 'status', 'severity'])
+    .optional()
+    .transform((val) => val || 'createdAt'),
+  sortOrder: z
+    .enum(['asc', 'desc'])
+    .optional()
+    .transform((val) => val || 'desc'),
 });
 
 // Validation middleware factory

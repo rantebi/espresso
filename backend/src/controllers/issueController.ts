@@ -37,8 +37,19 @@ export const getAllIssues = async (
     // Query params are validated and converted by middleware (with defaults applied)
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
+    const search = req.query.search as string | undefined;
+    const status = req.query.status as string | undefined;
+    const severity = req.query.severity as string | undefined;
+    const sortBy = (req.query.sortBy as 'createdAt' | 'status' | 'severity') || 'createdAt';
+    const sortOrder = (req.query.sortOrder as 'asc' | 'desc') || 'desc';
 
-    const result = await IssueModel.findAll(page, pageSize);
+    const result = await IssueModel.findAll(page, pageSize, {
+      search,
+      status,
+      severity,
+      sortBy,
+      sortOrder,
+    });
 
     res.status(200).json({
       success: true,
