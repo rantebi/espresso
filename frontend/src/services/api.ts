@@ -24,3 +24,16 @@ export const getIssues = async (
   return response.data.data;
 };
 
+export interface CreateIssueInput {
+  title: string;
+  description: string;
+  site: string;
+  severity: 'minor' | 'major' | 'critical';
+  status?: 'open' | 'in_progress' | 'resolved';
+}
+
+export const createIssue = async (input: CreateIssueInput): Promise<Issue> => {
+  const response = await api.post<ApiResponse<Issue>>('/issues', input);
+  return response.data.data;
+};
+
