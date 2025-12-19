@@ -35,10 +35,12 @@ app.get('/health', (req: Request, res: Response) => {
 // Error handler middleware (must be last)
 app.use(errorHandler);
 
-// Start server only if not in test mode
+// Start server only if not in test mode and not running as Lambda
 let server: ReturnType<typeof app.listen> | null = null;
 
-if (process.env.NODE_ENV !== 'test') {
+// Only start HTTP server if not in Lambda environment
+// Lambda environment is detected by checking for AWS_LAMBDA_FUNCTION_NAME
+if (process.env.NODE_ENV !== 'test' && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
   server = app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

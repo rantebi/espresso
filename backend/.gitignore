@@ -10,4 +10,8 @@ db/issues.db
 tests/test.db
 *.sqlite
 *.sqlite-journal
+.DS_Store
 
+# Serverless Framework
+.serverless/
+.serverlessignore

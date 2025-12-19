@@ -32,6 +32,7 @@ else
   else
     echo "Error: Failed to create table"
     echo "Make sure DynamoDB Local is running: ./scripts/start-dynamodb-local.sh"
+    echo "Or use: npm run dynamodb:start"
     exit 1
   fi
 fi

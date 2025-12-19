@@ -27,7 +27,7 @@ npm run dynamodb:start
 
 **Option B: Using shell script directly**
 ```bash
-# From project root
+# From backend directory
 ./scripts/start-dynamodb-local.sh
 ```
 
@@ -46,17 +46,7 @@ export DYNAMODB_TABLE=issues
 npm run dynamodb:create-table
 ```
 
-**Option B: Using shell script directly**
-```bash
-# Set environment variables
-export DYNAMODB_ENDPOINT=http://localhost:8000
-export DYNAMODB_TABLE=issues
-
-# Create the table
-./scripts/create-dynamodb-table.sh
-```
-
-**Option C: One-command setup**
+**Option B: One-command setup**
 ```bash
 cd backend
 export DYNAMODB_ENDPOINT=http://localhost:8000
@@ -64,7 +54,9 @@ export DYNAMODB_TABLE=issues
 npm run dynamodb:setup
 ```
 
-This will start DynamoDB Local and create the table in one command.
+This will start DynamoDB Local, wait 3 seconds, and create the table automatically.
+
+**Note:** The table creation script uses Node.js and doesn't require AWS CLI to be installed.
 
 Alternatively, you can use the AWS CLI directly:
 
@@ -178,8 +170,9 @@ cd backend
 npm run dynamodb:start
 ```
 
-Or from project root:
+Or use the script directly:
 ```bash
+cd backend
 ./scripts/start-dynamodb-local.sh
 ```
 
