@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { getIssueStatistics } from '../services/api';
+import { statusColors } from '../styles/colors';
 import './Home.scss';
 
 const Home: React.FC = () => {
@@ -47,11 +48,11 @@ const Home: React.FC = () => {
     fetchStatistics();
   }, []);
 
-  // Use colors from the color scheme: orange, yellow, green
+  // Use colors from the color scheme
   const colors = {
-    open: '#DB8A5B',      // Orange
-    in_progress: '#E4D166', // Yellow/Gold
-    resolved: '#7EE5AD',    // Green
+    open: statusColors.open,
+    in_progress: statusColors.inProgress,
+    resolved: statusColors.resolved,
   };
 
   const CustomTooltip = ({ active, payload }: any) => {
