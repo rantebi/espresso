@@ -139,3 +139,14 @@ export const uploadIssuesFromCSV = async (file: File): Promise<UploadIssuesRespo
   return response.data.data;
 };
 
+export interface IssueStatistics {
+  minor: { open: number; in_progress: number; resolved: number };
+  major: { open: number; in_progress: number; resolved: number };
+  critical: { open: number; in_progress: number; resolved: number };
+}
+
+export const getIssueStatistics = async (): Promise<IssueStatistics> => {
+  const response = await api.get<ApiResponse<IssueStatistics>>('/issues/stats');
+  return response.data.data;
+};
+

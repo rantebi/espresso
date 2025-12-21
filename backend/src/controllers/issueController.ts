@@ -199,6 +199,23 @@ export const getAllIssues = async (
   }
 };
 
+export const getIssueStatistics = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const statistics = await IssueModel.getStatistics();
+
+    res.status(200).json({
+      success: true,
+      data: statistics,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getIssueById = async (
   req: Request,
   res: Response,

@@ -202,6 +202,46 @@ export class IssueModel {
       },
     };
   }
+
+  async getStatistics(): Promise<{
+    minor: { open: number; in_progress: number; resolved: number };
+    major: { open: number; in_progress: number; resolved: number };
+    critical: { open: number; in_progress: number; resolved: number };
+  }> {
+    // Scan all issues from the table
+    const result = await dynamoDBClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+      })
+    );
+
+    const allIssues = (result.Items || []) as Issue[];
+
+    // Initialize counts
+    const stats = {
+      minor: { open: 0, in_progress: 0, resolved: 0 },
+      major: { open: 0, in_progress: 0, resolved: 0 },
+      critical: { open: 0, in_progress: 0, resolved: 0 },
+    };
+
+    // Count issues by severity and status
+    allIssues.forEach((issue) => {
+      const severity = issue.severity as 'minor' | 'major' | 'critical';
+      const status = issue.status as 'open' | 'in_progress' | 'resolved';
+
+      if (stats[severity] && status) {
+        if (status === 'open') {
+          stats[severity].open++;
+        } else if (status === 'in_progress') {
+          stats[severity].in_progress++;
+        } else if (status === 'resolved') {
+          stats[severity].resolved++;
+        }
+      }
+    });
+
+    return stats;
+  }
 }
 
 export default new IssueModel();

@@ -7,6 +7,7 @@ import {
   updateIssue,
   deleteIssue,
   uploadIssuesFromCSV,
+  getIssueStatistics,
 } from '../controllers/issueController';
 import {
   validateCreateIssue,
@@ -46,6 +47,11 @@ router.get(
   validatePagination,
   handleValidationErrors,
   getAllIssues
+);
+
+router.get(
+  '/issues/stats',
+  getIssueStatistics
 );
 
 router.get(
