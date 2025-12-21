@@ -1,11 +1,51 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import { ToastProvider, useToast } from './contexts/ToastContext';
 import { setToastFunction } from './services/api';
 import HomePage from './pages/Home';
 import IssuesPage from './pages/Issues';
 import CreateIssuePage from './pages/CreateIssue';
 import './App.css';
+
+const NavLink: React.FC<{ to: string; children: React.ReactNode; exact?: boolean }> = ({ to, children, exact = false }) => {
+  const location = useLocation();
+  let isActive: boolean;
+  
+  if (exact) {
+    isActive = location.pathname === to;
+  } else {
+    isActive = location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
+  }
+
+  return (
+    <Link to={to} className={isActive ? 'active' : ''}>
+      {children}
+    </Link>
+  );
+};
+
+const Navigation: React.FC = () => {
+  return (
+    <nav>
+      <div className="nav-container">
+        <Link to="/" className="logo">
+          <span className="logo-text">espresso</span>
+        </Link>
+        <ul>
+          <li>
+            <NavLink to="/" exact>Home</NavLink>
+          </li>
+          <li>
+            <NavLink to="/issues">Issues</NavLink>
+          </li>
+          <li>
+            <NavLink to="/issues/new" exact>Create Issue</NavLink>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
+};
 
 const AppContent: React.FC = () => {
   const { showToast } = useToast();
@@ -18,19 +58,7 @@ const AppContent: React.FC = () => {
   return (
     <Router>
       <div className="app-container">
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/issues">Issues</Link>
-            </li>
-            <li>
-              <Link to="/issues/new">Create Issue</Link>
-            </li>
-          </ul>
-        </nav>
+        <Navigation />
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />

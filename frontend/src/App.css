@@ -5,34 +5,89 @@
 }
 
 nav {
-  background-color: #333;
+  background: linear-gradient(to right, #e5e5e5 0%, #f5e6d3 100%);
   padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.logo-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+
+.logo-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  text-transform: lowercase;
+  letter-spacing: -0.5px;
 }
 
 nav ul {
   list-style: none;
   display: flex;
-  justify-content: center;
   gap: 2rem;
   margin: 0;
   padding: 0;
+  align-items: center;
 }
 
 nav li {
   margin: 0;
 }
 
-nav a {
-  color: #fff;
+nav a:not(.logo) {
+  color: #333;
   text-decoration: none;
   font-weight: 500;
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  position: relative;
 }
 
-nav a:hover {
-  background-color: #555;
+nav a:not(.logo):hover {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+nav a:not(.logo).active {
+  color: #000;
+  font-weight: 600;
+}
+
+nav a:not(.logo).active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 2px;
+  background-color: #333;
+  border-radius: 2px;
 }
 
 main {
