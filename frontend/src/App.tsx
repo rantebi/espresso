@@ -39,9 +39,6 @@ const Navigation: React.FC = () => {
           <li>
             <NavLink to="/issues">Issues</NavLink>
           </li>
-          <li>
-            <NavLink to="/issues/new" exact>Create Issue</NavLink>
-          </li>
         </ul>
       </div>
     </nav>
