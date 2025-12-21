@@ -64,11 +64,35 @@
   margin-bottom: 20px;
 }
 
-.file-label {
-  display: block;
+.file-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 10px;
+}
+
+.file-label {
   font-weight: 500;
   color: #333;
+}
+
+.btn-download-sample {
+  padding: 6px 12px;
+  background-color: transparent;
+  color: $status-resolved-bg;
+  border: 1px solid $status-resolved-bg;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  display: inline-block;
+}
+
+.btn-download-sample:hover {
+  background-color: $status-resolved-bg;
+  color: $status-resolved-text;
 }
 
 .file-input {

@@ -118,9 +118,18 @@ const CsvUploadDialog: React.FC<CsvUploadDialogProps> = ({
           {!uploadResult ? (
             <>
               <div className="file-input-section">
-                <label htmlFor="csv-file" className="file-label">
-                  Select CSV File
-                </label>
+                <div className="file-label-row">
+                  <label htmlFor="csv-file" className="file-label">
+                    Select CSV File
+                  </label>
+                  <a
+                    href="/sample-issues.csv"
+                    download="sample-issues.csv"
+                    className="btn-download-sample"
+                  >
+                    Download Sample
+                  </a>
+                </div>
                 <input
                   id="csv-file"
                   ref={fileInputRef}
