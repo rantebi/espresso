@@ -5,7 +5,7 @@ import {
   flexRender,
   type ColumnDef,
 } from '@tanstack/react-table';
-import './DataTable.css';
+import './DataTable.scss';
 
 export interface Column<T> {
   key: keyof T | string;

@@ -4,7 +4,7 @@ import { Issue, Severity, Status } from '../types';
 import { getIssues, GetIssuesParams } from '../services/api';
 import DataTable, { Column } from './DataTable';
 import { useDebounce } from '../hooks/useDebounce';
-import './IssueList.css';
+import './IssueList.scss';
 
 interface IssueListProps {
   initialPageSize?: number;

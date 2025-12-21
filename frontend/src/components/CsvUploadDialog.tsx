@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Papa from 'papaparse';
 import { uploadIssuesFromCSV, UploadIssuesResponse } from '../services/api';
-import './CsvUploadDialog.css';
+import './CsvUploadDialog.scss';
 
 interface CsvUploadDialogProps {
   isOpen: boolean;

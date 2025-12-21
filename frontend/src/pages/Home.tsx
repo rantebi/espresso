@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { getIssueStatistics } from '../services/api';
-import './Home.css';
+import './Home.scss';
 
 const Home: React.FC = () => {
   const [chartData, setChartData] = useState<Array<{
@@ -47,10 +47,11 @@ const Home: React.FC = () => {
     fetchStatistics();
   }, []);
 
+  // Use colors from the color scheme: orange, yellow, green
   const colors = {
-    open: '#FFD700',      // Yellow
-    in_progress: '#FF8C00', // Orange
-    resolved: '#32CD32',    // Green
+    open: '#DB8A5B',      // Orange
+    in_progress: '#E4D166', // Yellow/Gold
+    resolved: '#7EE5AD',    // Green
   };
 
   const CustomTooltip = ({ active, payload }: any) => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createIssue, CreateIssueInput } from '../services/api';
-import './CreateIssue.css';
+import './CreateIssue.scss';
 
 const CreateIssuePage: React.FC = () => {
   const navigate = useNavigate();

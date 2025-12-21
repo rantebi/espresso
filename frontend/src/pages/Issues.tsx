@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import IssueList from '../components/IssueList';
 import CsvUploadDialog from '../components/CsvUploadDialog';
-import './Issues.css';
+import './Issues.scss';
 
 const IssuesPage: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const successMessage = location.state?.message;
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
@@ -26,9 +27,12 @@ const IssuesPage: React.FC = () => {
           >
             📄 Upload CSV
           </button>
-          <Link to="/issues/new" className="btn-create-issue">
-            + Create Issue
-          </Link>
+          <button
+            className="btn-create-issue"
+            onClick={() => navigate('/issues/new')}
+          >
+            Create Issue
+          </button>
         </div>
       </div>
       {successMessage && (

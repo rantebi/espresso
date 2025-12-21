@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import Toast, { ToastMessage } from '../components/Toast';
-import '../components/Toast.css';
+import '../components/Toast.scss';
 
 interface ToastContextType {
   showToast: (message: string, type?: 'error' | 'success' | 'info') => void;

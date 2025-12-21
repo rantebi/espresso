@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getIssueById, updateIssue, UpdateIssueInput } from '../services/api';
-import './CreateIssue.css';
+import './CreateIssue.scss';
 
 const EditIssuePage: React.FC = () => {
   const navigate = useNavigate();

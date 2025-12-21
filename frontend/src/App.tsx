@@ -6,7 +6,7 @@ import HomePage from './pages/Home';
 import IssuesPage from './pages/Issues';
 import CreateIssuePage from './pages/CreateIssue';
 import EditIssuePage from './pages/EditIssue';
-import './App.css';
+import './App.scss';
 
 const NavLink: React.FC<{ to: string; children: React.ReactNode; exact?: boolean }> = ({ to, children, exact = false }) => {
   const location = useLocation();

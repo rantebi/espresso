@@ -1,3 +1,5 @@
+@import '../styles/colors.scss';
+
 /* Issue-specific styling for DataTable */
 .issue-list-container {
   display: flex;
@@ -79,34 +81,36 @@
   text-transform: capitalize;
 }
 
+// Severity badges - Grey shades
 .severity-minor {
-  background-color: #e3f2fd;
-  color: #1976d2;
+  background-color: $severity-minor-bg;
+  color: $severity-minor-text;
 }
 
 .severity-major {
-  background-color: #fff3e0;
-  color: #f57c00;
+  background-color: $severity-major-bg;
+  color: $severity-major-text;
 }
 
 .severity-critical {
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: $severity-critical-bg;
+  color: $severity-critical-text;
 }
 
+// Status badges - Orange, Yellow, Green
 .status-open {
-  background-color: #fff3e0;
-  color: #f57c00;
+  background-color: $status-open-bg;
+  color: $status-open-text;
 }
 
 .status-in_progress {
-  background-color: #e3f2fd;
-  color: #1976d2;
+  background-color: $status-in-progress-bg;
+  color: $status-in-progress-text;
 }
 
 .status-resolved {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+  background-color: $status-resolved-bg;
+  color: $status-resolved-text;
 }
 
 @media (max-width: 768px) {
@@ -118,3 +122,4 @@
     min-width: 100%;
   }
 }
+
