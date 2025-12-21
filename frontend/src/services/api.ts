@@ -98,6 +98,11 @@ export const getIssues = async (
   return response.data.data;
 };
 
+export const getIssueById = async (id: string): Promise<Issue> => {
+  const response = await api.get<ApiResponse<Issue>>(`/issues/${id}`);
+  return response.data.data;
+};
+
 export interface CreateIssueInput {
   title: string;
   description: string;
@@ -106,8 +111,21 @@ export interface CreateIssueInput {
   status?: 'open' | 'in_progress' | 'resolved';
 }
 
+export interface UpdateIssueInput {
+  title?: string;
+  description?: string;
+  site?: string;
+  severity?: 'minor' | 'major' | 'critical';
+  status?: 'open' | 'in_progress' | 'resolved';
+}
+
 export const createIssue = async (input: CreateIssueInput): Promise<Issue> => {
   const response = await api.post<ApiResponse<Issue>>('/issues', input);
+  return response.data.data;
+};
+
+export const updateIssue = async (id: string, input: UpdateIssueInput): Promise<Issue> => {
+  const response = await api.put<ApiResponse<Issue>>(`/issues/${id}`, input);
   return response.data.data;
 };
 
@@ -149,4 +167,3 @@ export const getIssueStatistics = async (): Promise<IssueStatistics> => {
   const response = await api.get<ApiResponse<IssueStatistics>>('/issues/stats');
   return response.data.data;
 };
-

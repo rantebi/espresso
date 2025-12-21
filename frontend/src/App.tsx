@@ -5,6 +5,7 @@ import { setToastFunction } from './services/api';
 import HomePage from './pages/Home';
 import IssuesPage from './pages/Issues';
 import CreateIssuePage from './pages/CreateIssue';
+import EditIssuePage from './pages/EditIssue';
 import './App.css';
 
 const NavLink: React.FC<{ to: string; children: React.ReactNode; exact?: boolean }> = ({ to, children, exact = false }) => {
@@ -33,7 +34,7 @@ const Navigation: React.FC = () => {
         </Link>
         <ul>
           <li>
-            <NavLink to="/" exact>Home</NavLink>
+            <NavLink to="/" exact>Dashboard</NavLink>
           </li>
           <li>
             <NavLink to="/issues">Issues</NavLink>
@@ -64,6 +65,7 @@ const AppContent: React.FC = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/issues" element={<IssuesPage />} />
             <Route path="/issues/new" element={<CreateIssuePage />} />
+            <Route path="/issues/:id/edit" element={<EditIssuePage />} />
           </Routes>
         </main>
       </div>

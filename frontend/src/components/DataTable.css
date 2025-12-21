@@ -42,6 +42,18 @@
   background-color: #f9f9f9;
 }
 
+.data-table tbody tr[style*="pointer"]:hover {
+  background-color: #f0f0f0;
+}
+
+.data-table tbody tr.clickable {
+  cursor: pointer;
+}
+
+.data-table tbody tr.clickable:hover {
+  background-color: #f0f0f0;
+}
+
 .data-table tbody tr:last-child {
   border-bottom: none;
 }

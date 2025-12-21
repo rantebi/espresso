@@ -21,6 +21,7 @@ interface DataTableProps<T> {
   loading?: boolean;
   hasMore?: boolean;
   onLoadMore?: () => void;
+  onRowClick?: (row: T) => void;
   emptyMessage?: string;
   getRowKey: (row: T, index: number) => string | number;
   className?: string;
@@ -33,6 +34,7 @@ function DataTable<T extends Record<string, any>>({
   loading = false,
   hasMore = false,
   onLoadMore,
+  onRowClick,
   emptyMessage = 'No data found',
   getRowKey,
   className = '',
@@ -113,7 +115,8 @@ function DataTable<T extends Record<string, any>>({
                   <tr
                     key={row.id}
                     ref={isLastRow && hasMore && onLoadMore ? lastRowRef : null}
-                    className={isLastRow && hasMore ? 'data-table-last-row' : ''}
+                    className={`${isLastRow && hasMore ? 'data-table-last-row' : ''} ${onRowClick ? 'clickable' : ''}`}
+                    onClick={() => onRowClick?.(row.original)}
                   >
                     {row.getVisibleCells().map((cell) => {
                       const meta = cell.column.columnDef.meta as { className?: string } | undefined;

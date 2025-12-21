@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Issue, Severity, Status } from '../types';
 import { getIssues, GetIssuesParams } from '../services/api';
 import DataTable, { Column } from './DataTable';
@@ -10,6 +11,7 @@ interface IssueListProps {
 }
 
 const IssueList: React.FC<IssueListProps> = ({ initialPageSize = 10 }) => {
+  const navigate = useNavigate();
   const [issues, setIssues] = useState<Issue[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -101,6 +103,10 @@ const IssueList: React.FC<IssueListProps> = ({ initialPageSize = 10 }) => {
       icon = sortOrder === 'asc' ? '↑' : '↓';
     }
     return icon;
+  };
+
+  const handleRowClick = (issue: Issue) => {
+    navigate(`/issues/${issue.id}/edit`);
   };
 
   const columns: Column<Issue>[] = [
@@ -214,6 +220,7 @@ const IssueList: React.FC<IssueListProps> = ({ initialPageSize = 10 }) => {
         loading={loading}
         hasMore={hasMore}
         onLoadMore={handleLoadMore}
+        onRowClick={handleRowClick}
         emptyMessage="No issues found"
         getRowKey={(issue) => issue.id}
       />

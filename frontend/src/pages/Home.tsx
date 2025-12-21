@@ -81,7 +81,7 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-page">
-      <h1>Issue Statistics by Severity</h1>
+      <h1>Dashboard</h1>
       <div className="chart-container">
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
