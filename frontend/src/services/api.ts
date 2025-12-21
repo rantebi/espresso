@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { Issue, PaginatedResponse } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -9,6 +9,60 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Store toast function reference
+let toastFunction: ((message: string, type?: 'error' | 'success' | 'info') => void) | null = null;
+
+// Export function to set toast function from context
+export const setToastFunction = (fn: (message: string, type?: 'error' | 'success' | 'info') => void) => {
+  toastFunction = fn;
+};
+
+// Response interceptor to handle errors
+api.interceptors.response.use(
+  (response: AxiosResponse) => {
+    // Return successful responses as-is
+    return response;
+  },
+  (error: AxiosError) => {
+    // Handle error responses
+    if (error.response) {
+      // Server responded with error status
+      const data = error.response.data as any;
+      
+      // Extract error message from response
+      let errorMessage = 'An error occurred';
+      
+      if (data?.error) {
+        errorMessage = data.error;
+      } else if (data?.message) {
+        errorMessage = data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Show toast notification
+      if (toastFunction) {
+        toastFunction(errorMessage, 'error');
+      }
+    } else if (error.request) {
+      // Request was made but no response received
+      const errorMessage = 'Network error: Unable to connect to server';
+      if (toastFunction) {
+        toastFunction(errorMessage, 'error');
+      }
+    } else {
+      // Something else happened
+      const errorMessage = error.message || 'An unexpected error occurred';
+      if (toastFunction) {
+        toastFunction(errorMessage, 'error');
+      }
+    }
+    
+    // Reject the promise so calling code can handle it if needed
+    return Promise.reject(error);
+  }
+);
 
 interface ApiResponse<T> {
   success: boolean;

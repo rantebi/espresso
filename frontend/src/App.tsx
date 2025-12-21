@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { ToastProvider, useToast } from './contexts/ToastContext';
+import { setToastFunction } from './services/api';
 import HomePage from './pages/Home';
 import IssuesPage from './pages/Issues';
 import CreateIssuePage from './pages/CreateIssue';
 import './App.css';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    // Set the toast function in the API service
+    setToastFunction(showToast);
+  }, [showToast]);
+
   return (
     <Router>
       <div className="app-container">
@@ -31,6 +40,14 @@ const App: React.FC = () => {
         </main>
       </div>
     </Router>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ToastProvider>
+      <AppContent />
+    </ToastProvider>
   );
 };
 

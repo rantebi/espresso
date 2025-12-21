@@ -19,7 +19,32 @@ export const errorHandler = (
   // Show verbose errors in development or test mode
   const isDev = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal server error';
+  
+  // Handle AggregateError (from Promise.allSettled/all with multiple failures)
+  // Common case: AWS SDK connection errors trying both IPv6 and IPv4
+  let message = err.message || 'Internal server error';
+  if (err.name === 'AggregateError' && (err as any).errors) {
+    const aggregateErr = err as any;
+    // Extract unique error messages from the aggregate
+    const errorMessages = aggregateErr.errors
+      .map((e: Error) => e?.message || String(e))
+      .filter((msg: string) => msg);
+    
+    // If all errors are connection errors, show a clearer message
+    const connectionErrors = errorMessages.filter((msg: string) => 
+      msg.includes('ECONNREFUSED') || msg.includes('connect')
+    );
+    if (connectionErrors.length > 0) {
+      // Check if it's a DynamoDB connection issue
+      if (process.env.DYNAMODB_ENDPOINT || process.env.NODE_ENV === 'development') {
+        message = `Cannot connect to DynamoDB at ${process.env.DYNAMODB_ENDPOINT || 'http://localhost:8000'}. Make sure DynamoDB Local is running.`;
+      } else {
+        message = connectionErrors[0]; // Use first connection error
+      }
+    } else {
+      message = errorMessages.join('; ') || message;
+    }
+  }
 
   const errorResponse: any = {
     success: false,
