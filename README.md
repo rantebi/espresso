@@ -1,5 +1,45 @@
 # Espresso - Trial Issue Log
 
+A full-stack web application for managing clinical trial issues with real-time statistics, CSV import, and advanced filtering capabilities.
+
+## Features
+
+- **Issue Management**: Create, read, update, and delete clinical trial issues
+- **Search & Filter**: Search by title, filter by status/severity, sort by multiple fields
+- **CSV Import**: Bulk upload issues via CSV with validation and preview
+- **Statistics Dashboard**: Real-time stacked bar chart showing issues by severity and status
+- **Responsive Design**: Modern UI with SCSS styling and color-coded status indicators
+
+## Technical Stack
+
+**Frontend:**
+- React 19 with TypeScript
+- Vite for build tooling
+- React Router for navigation
+- Recharts for data visualization
+- Generic Infinite Data-Table
+- Axios with interceptors for API calls
+- SCSS with centralized color variables
+
+**Backend:**
+- Node.js with Express 5
+- TypeScript
+- AWS DynamoDB for data storage
+- Zod for request validation
+- Multer for file uploads
+- Serverless Framework for AWS Lambda deployment
+
+**Infrastructure:**
+- AWS Lambda (API Gateway)
+- DynamoDB (local development + AWS)
+- S3 for frontend hosting
+- Docker for DynamoDB Local
+
+**Testing:**
+- Jest with ts-jest
+- Unit tests for models
+- Integration tests for API endpoints (CRUD, CSV upload, querying, validation)
+
 ## Prerequisites
 
 - Node.js 20.x or higher
